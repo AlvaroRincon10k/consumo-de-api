@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView.O
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.searchBreed.setOnQueryTextListener(this)
+        byBreed()
     }
 
     private fun initCharacter(puppies: DogsResponse) {
@@ -48,6 +49,26 @@ class MainActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView.O
         CoroutineScope(Dispatchers.IO).launch {
             val call =
                 getRetofit().create(APIService::class.java).getCharacterByName("$query/images")
+                    .execute()
+            val puppies = call.body()
+            if (puppies != null && puppies.status == "success") {
+                runOnUiThread {
+                    initCharacter(puppies)
+                    hideKeyboard()
+                }
+            } else {
+                runOnUiThread {
+                    showErrorDialog()
+                    hideKeyboard()
+                }
+            }
+        }
+    }
+
+    private fun byBreed() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val call =
+                getRetofit().create(APIService::class.java).getCharacterByName("hound/images")
                     .execute()
             val puppies = call.body()
             if (puppies != null && puppies.status == "success") {
