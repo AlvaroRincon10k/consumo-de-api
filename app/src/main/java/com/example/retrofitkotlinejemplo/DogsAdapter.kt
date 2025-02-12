@@ -1,10 +1,9 @@
 package com.example.retrofitkotlinejemplo
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_dog.view.*
+import com.example.retrofitkotlinejemplo.databinding.ItemDogBinding
 
 class DogsAdapter(val images: List<String>) : RecyclerView.Adapter<DogsAdapter.ViewHolder>() {
 
@@ -14,18 +13,18 @@ class DogsAdapter(val images: List<String>) : RecyclerView.Adapter<DogsAdapter.V
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        return ViewHolder(layoutInflater.inflate(R.layout.item_dog, parent, false))
+        val binding = ItemDogBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun getItemCount(): Int {
         return images.size
     }
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(private val binding: ItemDogBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(image: String) {
-            itemView.ivDog.fromUrl(image)
+            binding.ivDog.fromUrl(image)
         }
     }
 }

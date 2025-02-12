@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.retrofitkotlinejemplo.databinding.ActivityMainBinding
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,7 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView.OnQueryTextListener {
 
-    lateinit var imagesPuppies : List<String>
+    lateinit var imagesPuppies: List<String>
     lateinit var dogsAdapter: DogsAdapter
 
     private lateinit var binding: ActivityMainBinding
@@ -28,34 +27,39 @@ class MainActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView.O
         binding.searchBreed.setOnQueryTextListener(this)
     }
 
-    private fun initCharacter(puppies: DogsResponse){
-        if(puppies.status == "success"){
+    private fun initCharacter(puppies: DogsResponse) {
+        if (puppies.status == "success") {
             imagesPuppies = puppies.images
         }
         dogsAdapter = DogsAdapter(imagesPuppies)
-        rvDogs.setHasFixedSize(true)
-        rvDogs.layoutManager = LinearLayoutManager(this)
-        rvDogs.adapter = dogsAdapter
+        binding.rvDogs.setHasFixedSize(true)
+        binding.rvDogs.layoutManager = LinearLayoutManager(this)
+        binding.rvDogs.adapter = dogsAdapter
     }
 
-    private fun getRetofit(): Retrofit{
+    private fun getRetofit(): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://dog.ceo/api/breed/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
-    private fun searchByName(query: String){
-        CoroutineScope(Dispatchers.IO).launch{
-            val call = getRetofit().create(APIService::class.java).getCharacterByName("$query/images").execute()
-            val puppies = call.body() as DogsResponse
-            runOnUiThread{
-                if(puppies.status == "success"){
+    private fun searchByName(query: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val call =
+                getRetofit().create(APIService::class.java).getCharacterByName("$query/images")
+                    .execute()
+            val puppies = call.body()
+            if (puppies != null && puppies.status == "success") {
+                runOnUiThread {
                     initCharacter(puppies)
-                }else{
-                    showErrorDialog()
+                    hideKeyboard()
                 }
-                hideKeyboard()
+            } else {
+                runOnUiThread {
+                    showErrorDialog()
+                    hideKeyboard()
+                }
             }
         }
     }
